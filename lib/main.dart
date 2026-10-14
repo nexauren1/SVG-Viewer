@@ -273,9 +273,11 @@ class _SvgPreviewPageState extends State<SvgPreviewPage> {
     }
   }
 
-  Future<void> _share() => SharePlus.instance.share(
-    ShareParams(text: widget.source, subject: widget.filename),
-  );
+  Future<void> _share() async {
+    await SharePlus.instance.share(
+      ShareParams(text: widget.source, subject: widget.filename),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -395,9 +397,11 @@ class _SvgEditorPageState extends State<SvgEditorPage> {
     }
   }
 
-  Future<void> _share() => SharePlus.instance.share(
-    ShareParams(text: _controller.text, subject: widget.filename),
-  );
+  Future<void> _share() async {
+    await SharePlus.instance.share(
+      ShareParams(text: _controller.text, subject: widget.filename),
+    );
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(

@@ -57,6 +57,21 @@ class _SvgHomePageState extends State<SvgHomePage> {
   String? _error;
   bool _folderChosen = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _restoreSavedFolder();
+  }
+
+  Future<void> _restoreSavedFolder() async {
+    try {
+      final hasFolder = await _storage.invokeMethod<bool>('hasSavedFolder');
+      if (hasFolder == true && mounted) await _scan(choose: false);
+    } catch (_) {
+      // First launch: the user has not selected a folder yet.
+    }
+  }
+
   void _message(String text) {
     if (!mounted) return;
     ScaffoldMessenger.of(context)

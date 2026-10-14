@@ -77,7 +77,7 @@ class _SvgHomePageState extends State<SvgHomePage> {
       if (source == null) throw const FormatException('O conteúdo do ficheiro não está acessível.');
       if (!mounted) return;
       await _preview(file.name, source);
-    } catch (e) {
+    } catch (_) {
       _message('Não foi possível abrir o SVG. Verifica se o ficheiro é válido.');
     }
   }

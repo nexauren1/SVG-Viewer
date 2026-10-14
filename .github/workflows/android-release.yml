@@ -1,0 +1,98 @@
+name: Android build and release
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - 'v*'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: svg-viewer-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Test and build Android
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Generate Android host project
+        run: flutter create --platforms=android --org com.nexauren --project-name svgviewer build_app
+
+      - name: Overlay application source and Android folder scanner
+        run: |
+          rm -rf build_app/lib build_app/test
+          cp -R lib test build_app/
+          cp pubspec.yaml build_app/pubspec.yaml
+          mkdir -p build_app/android/app/src/main/kotlin/com/nexauren/svgviewer
+          cp android/app/src/main/kotlin/com/nexauren/svgviewer/MainActivity.kt build_app/android/app/src/main/kotlin/com/nexauren/svgviewer/MainActivity.kt
+
+      - name: Resolve dependencies
+        working-directory: build_app
+        run: flutter pub get
+
+      - name: Analyze Dart code
+        working-directory: build_app
+        run: flutter analyze
+
+      - name: Run automated tests
+        working-directory: build_app
+        run: flutter test
+
+      - name: Build release APK
+        working-directory: build_app
+        run: flutter build apk --release
+
+      - name: Build Google Play App Bundle
+        working-directory: build_app
+        run: flutter build appbundle --release
+
+      - name: Upload APK and AAB artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: svg-viewer-android-${{ github.run_number }}
+          path: |
+            build_app/build/app/outputs/flutter-apk/app-release.apk
+            build_app/build/app/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish rolling nightly release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: nightly
+          target_commitish: main
+          name: SVG Viewer — Nightly Build
+          body: |
+            Automated development build of SVG Viewer from the main branch.
+            Install the APK for device testing. This is a pre-release, not a production Google Play release.
+          prerelease: true
+          make_latest: false
+          files: |
+            build_app/build/app/outputs/flutter-apk/app-release.apk
+            build_app/build/app/outputs/bundle/release/app-release.aab
+
+      - name: Publish versioned release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: SVG Viewer ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            build_app/build/app/outputs/flutter-apk/app-release.apk
+            build_app/build/app/outputs/bundle/release/app-release.aab

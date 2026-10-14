@@ -21,7 +21,7 @@ The app does not request broad all-files access. The user chooses the folder to 
 
 The workflow at `.github/workflows/android-release.yml` creates the Android host project on a GitHub-hosted runner, overlays the Flutter source and Android Storage Access Framework implementation, runs `flutter analyze` and `flutter test`, and builds both an APK and an Android App Bundle.
 
-- Pushes to `main` build and update the **nightly** pre-release.
+- Pushes to `main` build and publish a numbered **nightly** pre-release.
 - Pushing a version tag such as `v1.0.0` builds and publishes a versioned GitHub Release.
 - APK and AAB are also uploaded as workflow artifacts.
 

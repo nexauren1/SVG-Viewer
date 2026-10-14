@@ -78,6 +78,10 @@ class MainActivity : FlutterActivity() {
         channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, channelName)
         channel?.setMethodCallHandler { call, result ->
             when (call.method) {
+                "hasSavedFolder" -> {
+                    val saved = getSharedPreferences(prefsName, MODE_PRIVATE).getString("tree_uri", null)
+                    result.success(saved != null)
+                }
                 "selectFolderAndScan" -> {
                     if (folderResult != null) {
                         result.error("BUSY", "Já existe uma seleção de pasta em curso.", null)

@@ -135,9 +135,11 @@ class _SvgHomePageState extends State<SvgHomePage> {
     }
   }
 
-  Future<void> _preview(String name, String source) => Navigator.of(context).push(
-    MaterialPageRoute<void>(builder: (_) => SvgPreviewPage(filename: name, source: source)),
-  );
+  Future<void> _preview(String name, String source) async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(builder: (_) => SvgPreviewPage(filename: name, source: source)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(

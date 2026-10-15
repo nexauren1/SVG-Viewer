@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.DocumentsContract
 import android.database.Cursor
-import android.webkit.MimeTypeMap
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
